@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinancePredict Bank — Banco demonstrativo</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;background:#f3f6fb;color:#172b45}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}header{background:#102b4d;color:#fff;padding:22px max(20px,calc((100% - 1160px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px}header strong{font-size:22px;letter-spacing:-.5px}.tag{font-size:12px;letter-spacing:.8px;background:#24577a;padding:8px 12px;border-radius:30px}main{max-width:1160px;margin:32px auto;padding:0 20px}.intro{margin-bottom:22px}.intro h1{margin:0;font-size:30px}.intro p{color:#5d6a80;line-height:1.5}.notice{border:1px solid #f1d3a1;background:#fff8eb;color:#744e09;padding:13px 16px;border-radius:12px;margin:18px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.panel{background:#fff;border:1px solid #e1e8f2;border-radius:17px;padding:24px;box-shadow:0 5px 25px #142d4b09}.panel h2{margin:0 0 17px;font-size:18px}.fields{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.field{display:flex;flex-direction:column;gap:7px}.field label{font-size:13px;font-weight:bold;color:#45546a}input,select{width:100%;border:1px solid #c8d3e2;padding:12px 13px;border-radius:10px;background:white;color:#1a304a;min-width:0}button{background:#1564af;border:0;border-radius:10px;color:#fff;font-weight:bold;padding:12px 17px}button:hover{background:#124e8a}button:disabled{opacity:.5;cursor:not-allowed}.muted{color:#62748b}.account{padding:20px;border-radius:14px;background:linear-gradient(120deg,#16365b,#235a84);color:#fff;margin-bottom:20px}.account small{opacity:.82}.account .balance{font-size:32px;font-weight:bold;margin:12px 0}.actions{display:grid;grid-template-columns:1fr 1fr;gap:15px}.actions form{display:flex;flex-direction:column;gap:10px}.secondary{background:#1d7777}.secondary:hover{background:#145959}.full{grid-column:1/-1}.status{margin:16px 0;padding:12px 16px;border-radius:10px;background:#e6f5ee;color:#125636;display:none}.status.error{background:#ffeded;color:#992b2b}table{width:100%;border-collapse:collapse;text-align:left;font-size:14px}th,td{padding:13px 8px;border-bottom:1px solid #e9eff5}th{color:#5c6b7d;font-size:12px;text-transform:uppercase}td:last-child,th:last-child{text-align:right}.pill{font-size:12px;background:#e9f3fa;color:#245676;border-radius:20px;padding:5px 8px}footer{margin:20px 0 40px;text-align:center;color:#728198;font-size:12px}@media(max-width:770px){.grid{grid-template-columns:1fr}.actions{grid-template-columns:1fr}header{padding:20px}.fields{grid-template-columns:1fr}h1{font-size:24px!important}.panel{padding:18px}}
+</style>
+</head>
+<body>
+<header><strong>◈ FinancePredict <span style="font-weight:normal;opacity:.7">Bank</span></strong><span class="tag">AMBIENTE DE DEMONSTRAÇÃO</span></header>
+<main>
+<section class="intro"><h1>Painel financeiro</h1><p>Simulador bancário para portfólio de desenvolvimento back-end em Java 17 e Spring Boot.</p></section>
+<div class="notice"><strong>Simulação apenas.</strong> Todas as contas são fictícias. Não insira dados pessoais reais. As informações ficam somente na memória do servidor e desaparecem quando ele reinicia.</div>
+<div id="message" class="status" role="status" aria-live="polite"></div>
+<div class="grid">
+<section class="panel">
+<h2>01 · Criar conta fictícia</h2>
+<form id="createForm" class="fields"><div class="field"><label for="holder">Nome fictício da conta</label><input id="holder" placeholder="Ex.: Cliente Demonstração" minlength="2" maxlength="80" required></div><button type="submit">Criar conta</button></form>
+<p class="muted" style="font-size:13px">Use nomes de teste; nunca utilize dados de clientes reais.</p>
+</section>
+<section class="panel">
+<h2>02 · Selecionar conta</h2><div class="field"><label for="accountSelect">Contas criadas nesta sessão</label><select id="accountSelect"><option value="">Nenhuma conta cadastrada</option></select></div>
+<p class="muted" style="font-size:13px">Você pode alternar entre contas fictícias enquanto esta página estiver aberta.</p>
+</section>
+<section class="panel full">
+<h2>03 · Movimentações bancárias simuladas</h2>
+<div class="account"><small>Saldo disponível · <span id="accountLabel">Selecione ou crie uma conta</span></small><div class="balance" id="balance">R$ 0,00</div><small>ID: <span id="accountId">—</span></small></div>
+<div class="actions">
+<form id="depositForm"><div class="field"><label for="depositAmount">Valor do depósito</label><input id="depositAmount" type="number" step=".01" min=".01" placeholder="0,00" required></div><button type="submit" class="secondary" data-requires-account>+ Depositar</button></form>
+<form id="withdrawForm"><div class="field"><label for="withdrawAmount">Valor do saque</label><input id="withdrawAmount" type="number" step=".01" min=".01" placeholder="0,00" required></div><button type="submit" data-requires-account>− Sacar</button></form>
+</div>
+</section>
+<section class="panel full">
+<h2>04 · Extrato de movimentações</h2><div style="overflow-x:auto"><table><thead><tr><th>Data e horário</th><th>Operação</th><th>Valor</th><th>Saldo após</th></tr></thead><tbody id="transactions"><tr><td colspan="4" class="muted">Selecione uma conta para consultar seu extrato.</td></tr></tbody></table></div>
+</section>
+</div>
+<footer>FinancePredict Bank · Projeto educacional · Java / Spring Boot · Sem vínculo com instituição financeira.</footer>
+</main>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const API = "/api/v1/accounts";
+const accounts = new Map();
+let currentId = "";
+const money = n => new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(Number(n));
+const date = n => new Date(n).toLocaleString("pt-BR");
+function notify(message,error=false){const node=$("message");node.textContent=message;node.className="status"+(error?" error":"");node.style.display="block";}
+function setEnabled(){document.querySelectorAll("[data-requires-account]").forEach(el=>el.disabled=!currentId);}
+function renderAccounts(){const sel=$("accountSelect");sel.replaceChildren();if(!accounts.size){const o=new Option("Nenhuma conta cadastrada","");sel.add(o);}else{for(const [id,name] of accounts){sel.add(new Option(name+" · "+id.slice(0,8),id));}}sel.value=currentId;setEnabled();}
+async function request(url,opts={}){let response;try{response=await fetch(url,{...opts,headers:{"Content-Type":"application/json"}});}catch{throw Error("Servidor indisponível. Verifique se a aplicação está em execução.");}if(!response.ok){let data={};try{data=await response.json();}catch{}throw Error(response.status===409?"Saldo insuficiente para realizar o saque.":response.status===404?"Conta não encontrada. Talvez o servidor tenha reiniciado.":response.status===400?"Confira o valor: use um número positivo com até duas casas decimais.":"Falha na operação (HTTP "+response.status+").");}return response.json();}
+function td(text){const cell=document.createElement("td");cell.textContent=text;return cell;}
+async function refresh(){if(!currentId){$("accountLabel").textContent="Selecione ou crie uma conta";$("accountId").textContent="—";$("balance").textContent=money(0);$("transactions").replaceChildren();setEnabled();return;}try{const account=await request(API+"/"+encodeURIComponent(currentId));$("accountLabel").textContent=account.holder;$("accountId").textContent=account.id;$("balance").textContent=money(account.balance);const entries=await request(API+"/"+encodeURIComponent(currentId)+"/transactions");const body=$("transactions");body.replaceChildren();if(!entries.length){const tr=document.createElement("tr");const cell=td("Nenhuma movimentação registrada.");cell.colSpan=4;tr.append(cell);body.append(tr);}for(const t of [...entries].reverse()){const tr=document.createElement("tr");tr.append(td(date(t.date)),td(t.type==="DEPOSIT"?"Depósito":"Saque"),td(money(t.amount)),td(money(t.balanceAfter)));body.append(tr);}}catch(e){notify(e.message,true);}setEnabled();}
+$("createForm").addEventListener("submit",async e=>{e.preventDefault();const button=e.submitter;button.disabled=true;try{const item=await request(API,{method:"POST",body:JSON.stringify({holder:$("holder").value.trim()})});accounts.set(item.id,item.holder);currentId=item.id;renderAccounts();await refresh();$("holder").value="";notify("Conta fictícia criada com sucesso.");}catch(err){notify(err.message,true);}finally{button.disabled=false;}});
+$("accountSelect").addEventListener("change",async e=>{currentId=e.target.value;await refresh();});
+async function movement(e,type,input){e.preventDefault();if(!currentId)return;const button=e.submitter;button.disabled=true;try{const raw=$(input).value;const cents=Math.round(Number(raw)*100);if(!Number.isFinite(cents)||cents<=0||Math.abs(cents/100-Number(raw))>1e-8)throw Error("Informe um valor positivo com no máximo duas casas decimais.");await request(API+"/"+encodeURIComponent(currentId)+"/"+type,{method:"POST",body:JSON.stringify({amount:(cents/100).toFixed(2)})});$(input).value="";await refresh();notify(type==="deposits"?"Depósito simulado realizado.":"Saque simulado realizado.");}catch(err){notify(err.message,true);}finally{button.disabled=false;setEnabled();}}
+$("depositForm").addEventListener("submit",e=>movement(e,"deposits","depositAmount"));
+$("withdrawForm").addEventListener("submit",e=>movement(e,"withdrawals","withdrawAmount"));
+setEnabled();
+</script>
+</body></html>
